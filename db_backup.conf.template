@@ -1,18 +1,26 @@
 #!/bin/bash
+# directory for storing backups
 DIRNAME=/Volumes/Storage/Backups/db
+
+# database user
 DB_USER=backup
+
+# database user password - leave empty for no password
 DB_PASS=
 
 # databases to backup from 1188
 # 1188_admin_prod  1188_admin_stage  1188_auth_prod  1188_sms_prod  begis.ATODA_JIRKA
 
-BACKUP_DAILY=(browser 1188_auth)
-BACKUP_WEEKLY=(browser 1188_auth)
-BACKUP_MONTHLY=(browser 1188_auth)
+# lists of databases to backup
+BACKUP_DAILY=(db1 db2 db3)
+BACKUP_WEEKLY=(db1 db2 db3)
+BACKUP_MONTHLY=(db1 db2 db3)
 
+# remove backups after X days
 DELETE_DAILY_AFTER=6
 DELETE_WEEKLY_AFTER=8
 DELETE_MONTHLY_AFTER=31
 
 # one of: linux, osx
+# (required for differences between OSes)
 OS=linux
