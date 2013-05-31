@@ -1,3 +1,4 @@
+#!/bin/bash
 DIRNAME=/Volumes/Storage/Backups/db
 DB_USER=backup
 DB_PASS=
@@ -12,3 +13,6 @@ BACKUP_MONTHLY=(browser 1188_auth)
 DELETE_DAILY_AFTER=6
 DELETE_WEEKLY_AFTER=8
 DELETE_MONTHLY_AFTER=31
+
+# one of: linux, osx
+OS=linux

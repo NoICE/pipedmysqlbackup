@@ -16,42 +16,42 @@ report_error ()
 
 backup_size()
 {
-    echo -n "[disk usage: "
-    # os x/freebsd:
-    echo -n `du -h -d 1 $1 | cut -f 1`
+    echo -n "[size:"
+    case $OS in
+        osx)
+            echo -n `du -h -d 1 $1 | cut -f 1`;;
+        linux)
+            echo -n `du -h --max-depth=0 $1 | cut -f 1`;;
+    esac
     echo "]"
-    # linux:
-    # du -h --max-depth=0 $DIRNAME/
 }
 
 # arguments: partial_path db1 db2 db3 .. dbN
 # e.g. db_backup weekly db1
 db_backup ()
 {
-    # DIRNAME/weekly
+    # e.g. DIRNAME/weekly
     DIR=$DIRNAME/$1
-    mkdir -p $DIR
-    # echo "${*:2}"
-    for ARG in "${@:2}" # "$@"
+    mkdir -p $DIR || (report_error && exit 1)
+
+    for ARG in "${@:2}"
     do
         # perform the backup
         FILENAME=${ARG}-${CURDATE}.sql.gz
         FULLPATH=${DIR}/${FILENAME}
-        echo -n "* backing up ${ARG} to ${FILENAME}"
+
+        echo -n "* backing up '${ARG}' to '${FILENAME}'... "
         if [ -z "$DB_PASS" ]; then
             mysqldump -u ${DB_USER} ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (report_error && rm ${FULLPATH})
         else
             mysqldump -u ${DB_USER} -p${DB_PASS}  ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
         fi
-        echo -n " "
+        echo -n "[done]"
 
         # report backup size
         backup_size $DIR
     done
 }
-
-# TODO zjistit z sql serveru seznam databazi...
-# a vyhodit z toho seznamu db ktery nepotrebuju...
 
 case $1 in
     daily)
@@ -68,9 +68,9 @@ case $1 in
         ;;
     cleanup)
         echo "* removing old backups"
-        find $DIRNAME/daily -mtime +${DELETE_DAILY_AFTER} -exec ls {} \; -exec rm {} \;
-        find $DIRNAME/weekly -mtime +${DELETE_WEEKLY_AFTER} -exec ls {} \; -exec rm {} \;
-        find $DIRNAME/monthly -mtime +${DELETE_MONTHLY_AFTER} -exec ls {} \; -exec rm {} \;
+        find ${DIRNAME}/daily -mtime +${DELETE_DAILY_AFTER} -exec ls {} \; -exec rm {} \;
+        find ${DIRNAME}/weekly -mtime +${DELETE_WEEKLY_AFTER} -exec ls {} \; -exec rm {} \;
+        find ${DIRNAME}/monthly -mtime +${DELETE_MONTHLY_AFTER} -exec ls {} \; -exec rm {} \;
         ;;
     *)
         echo "Usage: $0 <daily|weekly|monthly>"
