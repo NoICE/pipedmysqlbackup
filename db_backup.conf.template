@@ -1,0 +1,9 @@
+DIRNAME=/Volumes/Storage/Backups/db/
+DB_USER=backup
+
+# databases to backup from 1188
+# 1188_admin_prod  1188_admin_stage  1188_auth_prod  1188_sms_prod  begis.ATODA_JIRKA
+
+BACKUP_DAILY=(browser 1188_auth)
+BACKUP_WEEKLY=(browser 1188_auth)
+BACKUP_MONTHLY=(browser 1188_auth)

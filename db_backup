@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # config
-DIRBASE=/Volumes/Storage/Backups/db/
-DIRNAME=${DIRBASE}
+source $0.conf
+
+[ ! -z "$DIRNAME" ] || (echo "Missing DIRNAME" && exit 1)
+[ ! -z "$DB_USER" ] || (echo "Missing DB_USER" && exit 1)
 
 # helpers
 CURDATE=$(date +"%Y-%m-%d")
@@ -41,7 +43,7 @@ db_backup ()
         FILENAME=${ARG}-${CURDATE}.sql.gz
         FULLPATH=${DIR}/${FILENAME}
         echo -n "* backing up ${ARG} to ${FILENAME}"
-        mysqldump -u backup $ARG --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+        mysqldump -u ${DB_USER} $ARG --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
         echo -n " "
 
         # report backup size
@@ -54,12 +56,16 @@ db_backup ()
 
 case $1 in
     daily)
-        echo "* performing daily backups"
-        db_backup daily browser 1188_auth
+        echo "* performing $1 backups"
+        db_backup daily ${BACKUP_DAILY[*]}
         ;;
     weekly)
-        echo "* performing weekly backups"
-        db_backup weekly browser 1188_auth
+        echo "* performing $1 backups"
+        db_backup weekly ${BACKUP_WEEKLY[*]}
+        ;;
+    monthly)
+        echo "* performing $1 backups"
+        db_backup monthly ${BACKUP_MONTHLY[*]}
         ;;
     *)
         echo "Usage: $0 <daily|weekly|monthly>"
@@ -67,6 +73,3 @@ case $1 in
         exit 1
         ;;
 esac
-
-# databases to backup from 1188
-# 1188_admin_prod  1188_admin_stage  1188_auth_prod  1188_sms_prod  begis.ATODA_JIRKA
