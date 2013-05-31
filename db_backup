@@ -9,14 +9,9 @@ source $0.conf
 # helpers
 CURDATE=$(date +"%Y-%m-%d")
 
-f_error ()
+report_error ()
 {
     echo "[ERROR]"
-}
-
-f_done ()
-{
-    echo "[DONE]"
 }
 
 backup_size()
@@ -44,7 +39,7 @@ db_backup ()
         FULLPATH=${DIR}/${FILENAME}
         echo -n "* backing up ${ARG} to ${FILENAME}"
         if [ -z "$DB_PASS" ]; then
-            mysqldump -u ${DB_USER} ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+            mysqldump -u ${DB_USER} ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (report_error && rm ${FULLPATH})
         else
             mysqldump -u ${DB_USER} -p${DB_PASS}  ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
         fi
@@ -73,9 +68,9 @@ case $1 in
         ;;
     cleanup)
         echo "* removing old backups"
-        find $DIRNAME/daily -mtime +6 -exec ls {} \; -exec rm {} \;
-        find $DIRNAME/weekly -mtime +8 -exec ls {} \; -exec rm {} \;
-        find $DIRNAME/monthly -mtime +32 -exec ls {} \; -exec rm {} \;
+        find $DIRNAME/daily -mtime +${DELETE_DAILY_AFTER} -exec ls {} \; -exec rm {} \;
+        find $DIRNAME/weekly -mtime +${DELETE_WEEKLY_AFTER} -exec ls {} \; -exec rm {} \;
+        find $DIRNAME/monthly -mtime +${DELETE_MONTHLY_AFTER} -exec ls {} \; -exec rm {} \;
         ;;
     *)
         echo "Usage: $0 <daily|weekly|monthly>"
