@@ -3,8 +3,8 @@
 # config
 source $0.conf
 
-[ ! -z "$DIRNAME" ] || (echo "Missing DIRNAME" && exit 1)
-[ ! -z "$DB_USER" ] || (echo "Missing DB_USER" && exit 1)
+[ -z "$DIRNAME" ] && (echo "Missing DIRNAME" && exit 1)
+[ -z "$DB_USER" ] && (echo "Missing DB_USER" && exit 1)
 
 # helpers
 CURDATE=$(date +"%Y-%m-%d")
@@ -43,7 +43,11 @@ db_backup ()
         FILENAME=${ARG}-${CURDATE}.sql.gz
         FULLPATH=${DIR}/${FILENAME}
         echo -n "* backing up ${ARG} to ${FILENAME}"
-        mysqldump -u ${DB_USER} $ARG --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+        if [ -z "$DB_PASS" ]; then
+            mysqldump -u ${DB_USER} ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+        else
+            mysqldump -u ${DB_USER} -p${DB_PASS}  ${ARG} --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+        fi
         echo -n " "
 
         # report backup size
