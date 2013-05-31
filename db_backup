@@ -67,6 +67,12 @@ case $1 in
         echo "* performing $1 backups"
         db_backup monthly ${BACKUP_MONTHLY[*]}
         ;;
+    cleanup)
+        echo "* removing old backups"
+        find $DIRNAME/daily -mtime +6 -exec ls {} \; -exec rm {} \;
+        find $DIRNAME/weekly -mtime +8 -exec ls {} \; -exec rm {} \;
+        find $DIRNAME/monthly -mtime +32 -exec ls {} \; -exec rm {} \;
+        ;;
     *)
         echo "Usage: $0 <daily|weekly|monthly>"
         echo "Performs backups of databases configured for given time period."

@@ -1,4 +1,4 @@
-DIRNAME=/Volumes/Storage/Backups/db/
+DIRNAME=/Volumes/Storage/Backups/db
 DB_USER=backup
 
 # databases to backup from 1188
