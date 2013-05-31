@@ -1,0 +1,72 @@
+#!/bin/bash
+
+# config
+DIRBASE=/Volumes/Storage/Backups/db/
+DIRNAME=${DIRBASE}
+
+# helpers
+CURDATE=$(date +"%Y-%m-%d")
+
+f_error ()
+{
+    echo "[ERROR]"
+}
+
+f_done ()
+{
+    echo "[DONE]"
+}
+
+backup_size()
+{
+    echo -n "[disk usage: "
+    # os x/freebsd:
+    echo -n `du -h -d 1 $1 | cut -f 1`
+    echo "]"
+    # linux:
+    # du -h --max-depth=0 $DIRNAME/
+}
+
+# arguments: partial_path db1 db2 db3 .. dbN
+# e.g. db_backup weekly db1
+db_backup ()
+{
+    # DIRNAME/weekly
+    DIR=$DIRNAME/$1
+    mkdir -p $DIR
+    # echo "${*:2}"
+    for ARG in "${@:2}" # "$@"
+    do
+        # perform the backup
+        FILENAME=${ARG}-${CURDATE}.sql.gz
+        FULLPATH=${DIR}/${FILENAME}
+        echo -n "* backing up ${ARG} to ${FILENAME}"
+        mysqldump -u backup $ARG --single-transaction --quick|gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+        echo -n " "
+
+        # report backup size
+        backup_size $DIR
+    done
+}
+
+# TODO zjistit z sql serveru seznam databazi...
+# a vyhodit z toho seznamu db ktery nepotrebuju...
+
+case $1 in
+    daily)
+        echo "* performing daily backups"
+        db_backup daily browser 1188_auth
+        ;;
+    weekly)
+        echo "* performing weekly backups"
+        db_backup weekly browser 1188_auth
+        ;;
+    *)
+        echo "Usage: $0 <daily|weekly|monthly>"
+        echo "Performs backups of databases configured for given time period."
+        exit 1
+        ;;
+esac
+
+# databases to backup from 1188
+# 1188_admin_prod  1188_admin_stage  1188_auth_prod  1188_sms_prod  begis.ATODA_JIRKA
