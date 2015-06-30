@@ -1,15 +1,12 @@
 #!/bin/bash
 # directory for storing backups
-DIRNAME=/Volumes/Storage/Backups/db
+DIRNAME=/var/backups/db
 
-# database user
+# database user, preferrably read only
 DB_USER=backup
 
 # database user password - leave empty for no password
 DB_PASS=
-
-# databases to backup from 1188
-# 1188_admin_prod  1188_admin_stage  1188_auth_prod  1188_sms_prod  begis.ATODA_JIRKA
 
 # lists of databases to backup
 BACKUP_DAILY=(db1 db2 db3)

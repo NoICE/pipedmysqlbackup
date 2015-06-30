@@ -1,14 +1,18 @@
 # DB Backup
 
 Simple tool for backing up mysql databases, using mysqldump
-(with --single-transaction argument for non-blocking backups),
+with --single-transaction argument for non-blocking backups
+(do NOT use this if your backed up tables don't use InnoDB),
 gzip, separating backups to different directories.
-Can do cleanup of old backups.
+
+Optionally can do cleanup of old backups (older than defined time in days).
 
 ## Installation and usage
 
-- Copy to the database server via SSH or similar.
+- Copy to the database server via SSH or similar (or git clone https://github.com/NoICE/pipedmysqlbackup.git) to /opt/pipedmysqlbackup.
 - Ensure that the script is executable (`chmod u+x ./db_backup`).
+- Create some mysql user with SELECT privileges to databases you want to backup (or you can use existing user)
+    E.g.: `GRANT SELECT, SHOW DATABASES ON *.* TO backup@localhost;`
 - Copy `db_backup.conf.template` to `db_backup.conf` and update corresponding values.
   This file must be in the same directory as the backup script (for now).
 - Insert this script to crontab (using `crontab -e` or similar).
