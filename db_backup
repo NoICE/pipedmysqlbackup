@@ -44,7 +44,7 @@ db_backup ()
         if [ -z "$DB_PASS" ]; then
             mysqldump -u ${DB_USER} ${ARG} --single-transaction | gzip -5 > ${FULLPATH} || (report_error && rm ${FULLPATH})
         else
-            mysqldump -u ${DB_USER} -p${DB_PASS}  ${ARG} --single-transaction | gzip -5 > ${FULLPATH} || (f_error && rm ${FULLPATH})
+            mysqldump -u ${DB_USER} -p${DB_PASS}  ${ARG} --single-transaction | gzip -5 > ${FULLPATH} || (report_error && rm ${FULLPATH})
         fi
         echo -n "[done]"
 
